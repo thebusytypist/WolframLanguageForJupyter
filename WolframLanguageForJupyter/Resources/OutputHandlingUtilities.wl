@@ -9,6 +9,7 @@ Description:
 		notebooks
 Symbols defined:
 	textQ,
+	mathExprQ,
 	toOutText,
 	toImageData,
 	toOutImage
@@ -74,6 +75,25 @@ If[
 			ToCharacterCode[str, "Unicode"],
 			(57344 <= #1 <= 63743 || 983040 <= #1 <= 1048575 || 1048576 <= #1 <= 1114111) &
 		];
+
+(************************************
+	utility for determining if a
+		result can be displayed
+		in MathML
+*************************************)
+	mathExprQ[expr_] := Module[
+		{
+			(* the head of expr *)
+			exprHead
+		},
+
+		exprHead = Head[expr];
+
+		If[Or[exprHead === Graphics, exprHead === Graphics3D],
+			Return[False],
+			Return[True]
+		];
+	];
 
 (************************************
 	utility for determining if a
@@ -315,6 +335,20 @@ If[
 					"\">"
 				]
 			]
+		];
+
+	(* generate MathML for math expression *)
+	toOutMathML[result_] := 
+		Module[
+			{
+				(* the rasterization of result *)
+				mathmlData
+			},
+
+			mathmlData = ExportString[$trueFormatType[result], "MathML"];
+
+			(* return MathML for the result *)
+			Return[mathmlData];
 		];
 
 	(* end the private context for WolframLanguageForJupyter *)

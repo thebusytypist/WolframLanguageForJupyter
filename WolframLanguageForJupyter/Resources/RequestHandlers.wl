@@ -31,8 +31,7 @@ If[
 
 	Get[FileNameJoin[{DirectoryName[$InputFileName], "EvaluationUtilities.wl"}]]; (* simulatedEvaluate *)
 
-	Get[FileNameJoin[{DirectoryName[$InputFileName], "OutputHandlingUtilities.wl"}]]; (* textQ, toOutText, toOutImage,
-																							containsPUAQ *)
+	Get[FileNameJoin[{DirectoryName[$InputFileName], "OutputHandlingUtilities.wl"}]]; (* textQ, mathExprQ, toOutText, toOutImage, toOutMathML, containsPUAQ *)
 
 	Get[FileNameJoin[{DirectoryName[$InputFileName], "CompletionUtilities.wl"}]]; (* rewriteNamedCharacters *)
 
@@ -187,7 +186,10 @@ If[
 				(* otherwise, use a function that converts the output to an image *)
 				If[AllTrue[totalResult["EvaluationResult"], textQ],
 					toOut = toOutText,
-					toOut = toOutImage
+					If[mathExprQ[totalResult["EvaluationResult"]],
+						toOut = toOutMathML,
+						toOut = toOutImage
+					]
 				];
 				(* prepare the content for a reply message frame to be sent on the IO Publish socket *)
 				ioPubReplyContent = ExportString[
